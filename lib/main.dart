@@ -33,6 +33,7 @@ class MyApp extends StatelessWidget {
 }
 
 class Home extends StatelessWidget{
+  List<Post> posts =[];
 
   callAPI(){
     Post post = Post(
@@ -54,17 +55,18 @@ class Home extends StatelessWidget{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-        body : FutureBuilder<Post>(
-            future: getPost(),
+        body : FutureBuilder<List<Post>>(
+            future: getAllPosts(),
             builder: (context, snapshot) {
-              callAPI();
+              // callAPI();
               if(snapshot.connectionState == ConnectionState.done) {
 
                 if(snapshot.hasError){
                   return Text("Error");
                 }
 
-                return Text('Title from Post JSON : ${snapshot.data.title}');
+                // return Text('Title from Post JSON : ${snapshot.data.title}');
+                return createListView(context, snapshot);
 
               }
               else
@@ -74,4 +76,22 @@ class Home extends StatelessWidget{
     );
   }
 
+
+ Widget createListView(BuildContext context, AsyncSnapshot snapshot) {
+    List<Post> values = snapshot.data;
+    return new ListView.builder(
+        itemCount: values.length,
+        itemBuilder: (BuildContext context, int index) {
+          return new Column(
+            children: <Widget>[
+              new ListTile(
+                title: new Text(values[index].title),
+                subtitle: new Text(values[index].body),
+              ),
+              new Divider(height: 2.0,),
+            ],
+          );
+        },
+    );
+  }
 }
